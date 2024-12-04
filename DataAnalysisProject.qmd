@@ -12,6 +12,7 @@ knitr:
     message: false
     warning: false 
 editor: source 
+bibliography: proj_refs.bib
 ---
 
 ```{r}
@@ -58,14 +59,14 @@ show \_\_.
 ● Ends with overall conclusions related to your research question that
 are supported by your data analysis.
 
-##### Null Hypothesis: Do movies that pass the Bechdel Test have a higher budget? 
+##### Null Hypothesis: There is no difference in the average budget of movies that pass or fail the Bechdel test. 
 $$
-\mu_{Budget} - \mu_{Pass/Fail} = 0
+\mu_{Pass} - \mu_{Fai} = 0
 $$
 
-##### Alternative Hypothesis: The movies with lower budgets fail the bechdel test. 
+##### Alternative Hypothesis: There is a difference in the average budget of movies that pass or fail the Bechdel test.
 $$
-\mu_{Budget} - \mu_{Pass/Fail} \ne 0
+\mu_{Pass} - \mu_{Fail} \ne 0
 $$
 #### Raw Data
 ```{r}
