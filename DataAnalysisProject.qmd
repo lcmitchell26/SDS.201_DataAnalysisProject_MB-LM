@@ -1,3 +1,4 @@
+
 ---
 title: "SDS 201 Data Analysis Project"
 author: "Musa Bah and Lily Mitchell"
@@ -100,12 +101,16 @@ plotting
 
 kable(plotting)
 ```
-
+This bar plot visualizes the differnce between average budgets.
 ```{r}
 ggplot(plotting, aes(binary, avg_budget)) +
   geom_bar(stat = "identity")
 ```
-
+We can see the breakdown of this more precisely with a boxplot that can show outliers.
+```{r}
+ggplot(movies_clean, aes(binary, budget_2013)) +
+  geom_boxplot()
+```
 
 
 Start hypothesis testing
@@ -122,6 +127,18 @@ Get a regression model
 bechdel_model <- lm(budget_2013 ~ binary, data = movies_clean)
 get_regression_table(bechdel_model)
 ```
+
+```{r}
+ggplot(bechdel_model, aes(x = binary, y = budget_2013)) +
+  geom_jitter(width = 0.25) +
+  geom_categorical_model() +
+  labs(title = "Movie Budgets vs. Bechdel Test Binary",
+       x = "Binary - PASS/FAIL",
+       y = "Budget 2013") +
+  theme_minimal()
+```
+
+
 
 Permutation distribution
 ```{r}
@@ -159,6 +176,13 @@ visualize(permutation_distribution) + shade_p_value(obs_stat = 16637388, directi
 The probability of observing a test statistic at least as extreme as the one observed from our sample, assuming the null hypothesis is true, is 0. 
 
 Our alpha level is 0.05, and our p-value is 0, and because p-value < alpha value, we can reject the null hypothesis and conclude that there is a statistical significance between the average budget and a movie passing or failing the bechdel test. 
+
+```{r}
+movies_model <- lm(budget_2013 ~ binary, data = movies_clean)
+
+get_regression_table(movies_model)
+```
+
 
 
 ## Results
