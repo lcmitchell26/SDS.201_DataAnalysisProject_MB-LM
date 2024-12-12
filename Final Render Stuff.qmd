@@ -1,0 +1,214 @@
+---
+title: "SDS 201 Data Analysis Project"
+author: "Musa Bah and Lily Mitchell"
+format: 
+    html:
+      embed-resources: false
+code-fold: false
+execute: 
+  echo: true 
+knitr: 
+  opts_chunk: 
+    message: false
+    warning: false 
+editor: source 
+bibliography: proj_refs.bib
+---
+
+```{r}
+#| eval: true
+#| echo: false
+#| message: false
+
+library(tidyverse)
+library(googlesheets4)
+library(ggplot2)
+library(dplyr)
+library(janitor)
+library(moderndive)
+library(knitr)
+```
+
+![BechdelTest](https://img10.hotstar.com/image/upload/f_auto/sources/r1/cms/prod/8995/1368995-i-b1fa2d292a86){width="900"}
+
+# Hollywood vs. The Bechdel Test
+
+## Introduction
+
+● Explains the nature of the data you are analyzing in sufficient detail
+
+Hollywood's long history of sexism now faces the blatent truths that only statistics can make perfectly clear. The Bechdel Test, designed to measures representaiton of women in film and other fictional media, is responsible for revealing the representation and monitary inequities of the industry. For a movie to pass the test it must feature two female characters who have converstations about a topic other than men. With data from #\_\_ movies we uncover the extent of the dilhema illustrated below.
+
+● Explains what analyses are performed and what can be learned from them
+
+Our data analysis has reason to consider the numeric variable of budget and categorical Pass/Fail due to \_\_ discrimination. We prose the question "Do movies that pass the Bechdel Test have a higher budget?". If this is true our hypothesis would reveal that these variables are related to one another and that movies with lower budgets fail the bechdel test. The numerica variable Budget serves as the outcome variable in our analysis while the categorical variable to Pass or Fail Bechdel Test rpovides the explanatory variable of the analysis. To test this method we will use a regression model with a permutation test to show \_\_.
+
+● Ends with overall conclusions related to your research question that are supported by your data analysis.
+
+Explanatory Variable: Passing or failing the Bechdel Test.\
+Outcome Variable: Budget of the movie.
+
+## Raw Data
+
+```{r}
+#| label: tbl-
+#| tbl-cap: " "
+#| eval: true
+#| echo: false
+#| message: false
+movies_raw <- read_sheet("https://docs.google.com/spreadsheets/d/12xXTpjqwY35HV5WcAZtIGxnLc8xmBD0hQPVZKR5njcY/edit?gid=1554984819#gid=1554984819")
+
+movies_raw_display <- slice(movies_raw, 1:3) 
+kable(movies_raw_display) 
+```
+
+## Data for Analysis
+
+```{r}
+#| label: tbl-
+#| tbl-cap: " "
+#| eval: true
+#| echo: false
+#| message: false
+movies <- movies_raw |>
+  select(title, binary, budget)
+
+movies <- slice(movies, 1:8)
+kable(movies)
+```
+
+```{r}
+#| label: tbl-
+#| tbl-cap: " "
+#| eval: true
+#| echo: false
+#| message: false
+movies_clean <- movies_raw |>
+  select(c("title", "binary", "budget_2013")) |>
+  mutate(budget_2013 = as.numeric(budget_2013))
+```
+
+## Summary of Data
+
+```{r}
+#| label: tbl-
+#| tbl-cap: " "
+#| eval: true
+#| echo: false
+#| message: false
+plotting <- movies_clean |>
+  group_by(binary) |>
+  summarize(avg_budget = mean(budget_2013),
+           Number = n(),
+           Standard_Deviation = sd(budget_2013))
+kable(plotting)
+```
+
+This bar plot visualizes the differnce between average budgets.
+
+```{r}
+#| label: fig-
+#| fig-cap: " "
+#| eval: true
+#| echo: false
+#| message: false
+ggplot(plotting, aes(binary, avg_budget)) +
+  geom_bar(stat = "identity")
+```
+
+We can see the breakdown of this more precisely with a boxplot that can show outliers.
+
+```{r}
+#| label: fig-
+#| fig-cap: " "
+#| eval: true
+#| echo: false
+#| message: false
+ggplot(movies_clean, aes(binary, budget_2013)) +
+  geom_boxplot()
+```
+
+Start hypothesis testing
+
+Get a test statistic FAIL - PASS = X 62911555 - 46274167 = 16637388
+
+```{r}
+#| label: fig-
+#| fig-cap: " "
+#| eval: true
+#| echo: false
+#| message: false
+62911555 - 46274167
+```
+
+Get a regression model
+
+```{r}
+#| label: tbl-
+#| tbl-cap: " "
+#| eval: true
+#| echo: false
+#| message: false
+bechdel_model <- lm(budget_2013 ~ binary, data = movies_clean)
+get_regression_table(bechdel_model)
+```
+
+Movie Budgets vs. Bechdel Test Binary
+
+```{r}
+#| label: fig-
+#| fig-cap: " "
+#| eval: true
+#| echo: false
+#| message: false
+ggplot(bechdel_model, aes(x = binary, y = budget_2013)) +
+  geom_jitter(width = 0.25) +
+  geom_categorical_model() +
+  labs(title = "Movie Budgets vs. Bechdel Test Binary",
+       x = "Binary - PASS/FAIL",
+       y = "Budget 2013") +
+  theme_minimal()
+```
+
+The probability of observing a test statistic at least as extreme as the one observed from our sample, assuming the null hypothesis is true, is 0.
+
+Our alpha level is 0.05, and our p-value is 0, and because p-value \< alpha value, we can reject the null hypothesis and conclude that there is a statistical significance between the average budget and a movie passing or failing the bechdel test.
+
+```{r}
+#| label: tbl-
+#| tbl-cap: " "
+#| eval: true
+#| echo: false
+#| message: false
+movies_model <- lm(budget_2013 ~ binary, data = movies_clean)
+
+get_regression_table(movies_model)
+```
+
+Regression Equation:\
+
+$$
+\widehat{Budget} = b_0 + b_1 \cdot 1_{Pass}(Binary)
+\tag{1}
+$$
+
+
+$$\
+\widehat{Budget} = 62911555 + (-16637388 * 1_{Pass}(Binary))
+$$
+
+
+Each Coefficient Explained: Budget_2013\
+Binary
+
+## Results
+
+## Discussion
+
+### Conclusions
+
+### Limitations
+
+### Further Questions
+
+#### Bibliography
