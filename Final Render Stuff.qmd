@@ -37,7 +37,7 @@ library(knitr)
 
 ● Explains the nature of the data you are analyzing in sufficient detail
 
-Hollywood's long history of sexism now faces the blatent truths that only statistics can make perfectly clear. The Bechdel Test, designed to measures representaiton of women in film and other fictional media, is responsible for revealing the representation and monitary inequities of the industry. For a movie to pass the test it must feature two female characters who have converstations about a topic other than men. With data from #\_\_ movies we uncover the extent of the dilhema illustrated below.
+Our research project brings Hollywood's long history of sexism face to face with the the blatent truths that the power of statistics make perfectly clear. The Bechdel Test, designed to measures representaiton of women in film and other fictional media, is responsible for revealing the representational and monitary inequities of the industry. For a movie to pass the test it must feature two female characters who have converstations about a topic other than men. With data from @fivethirtyeight_bechdel movies we uncover the extent of the dilhema which we explore below. 
 
 ● Explains what analyses are performed and what can be learned from them
 
@@ -51,8 +51,8 @@ Outcome Variable: Budget of the movie.
 ## Raw Data
 
 ```{r}
-#| label: tbl-
-#| tbl-cap: " "
+#| label: tbl-movies_raw
+#| tbl-cap: "Raw Data Set Import "
 #| eval: true
 #| echo: false
 #| message: false
@@ -65,34 +65,36 @@ kable(movies_raw_display)
 ## Data for Analysis
 
 ```{r}
-#| label: tbl-
-#| tbl-cap: " "
+#| label: tbl-selected_moviedata
+#| tbl-cap: "Wrangled Movies Data for Research Project "
 #| eval: true
 #| echo: false
 #| message: false
 movies <- movies_raw |>
   select(title, binary, budget)
 
-movies <- slice(movies, 1:8)
+movies <- slice(movies, 1:5)
 kable(movies)
 ```
 
 ```{r}
-#| label: tbl-
-#| tbl-cap: " "
+#| label: tbl-movies_clean_budget
+#| tbl-cap: "Movies Clean Includes the 2013 inflation adjusted Budget"
 #| eval: true
 #| echo: false
 #| message: false
 movies_clean <- movies_raw |>
   select(c("title", "binary", "budget_2013")) |>
   mutate(budget_2013 = as.numeric(budget_2013))
+movies_clean_display <- slice(movies_clean, 1:5)
+kable(movies_clean_display)
 ```
 
 ## Summary of Data
 
 ```{r}
-#| label: tbl-
-#| tbl-cap: " "
+#| label: tbl-movies_summary
+#| tbl-cap: "Summary of Movies Data "
 #| eval: true
 #| echo: false
 #| message: false
@@ -104,11 +106,9 @@ plotting <- movies_clean |>
 kable(plotting)
 ```
 
-This bar plot visualizes the differnce between average budgets.
-
 ```{r}
-#| label: fig-
-#| fig-cap: " "
+#| label: fig-movies_histogram
+#| fig-cap: "Average Budget Differences"
 #| eval: true
 #| echo: false
 #| message: false
@@ -119,8 +119,8 @@ ggplot(plotting, aes(binary, avg_budget)) +
 We can see the breakdown of this more precisely with a boxplot that can show outliers.
 
 ```{r}
-#| label: fig-
-#| fig-cap: " "
+#| label: fig-movies_boxplot
+#| fig-cap: "Boxplot showing the difference between average movie budgets more accuratly capturing outliers"
 #| eval: true
 #| echo: false
 #| message: false
@@ -128,24 +128,31 @@ ggplot(movies_clean, aes(binary, budget_2013)) +
   geom_boxplot()
 ```
 
-Start hypothesis testing
+In @tbl-movies_summary we see the that this bar plot visualizes the differnce between average budgets. This origional finding prompted our hypotesis test to explore this difference.\
 
-Get a test statistic FAIL - PASS = X 62911555 - 46274167 = 16637388
+Next @
+
+#### Test Statistic
+
+FAIL - PASS = X \
+62911555 - 46274167 = 16637388\
+
+## Hypothesis Testing
 
 ```{r}
-#| label: fig-
-#| fig-cap: " "
+#| label: fig-summary_stat
+#| fig-cap: "Calculating the Summary Statistic for Hypothesis Test "
 #| eval: true
 #| echo: false
 #| message: false
 62911555 - 46274167
 ```
 
-Get a regression model
+### Get a regression model
 
 ```{r}
-#| label: tbl-
-#| tbl-cap: " "
+#| label: tbl-regression_table
+#| tbl-cap: "Regression Table"
 #| eval: true
 #| echo: false
 #| message: false
@@ -153,11 +160,11 @@ bechdel_model <- lm(budget_2013 ~ binary, data = movies_clean)
 get_regression_table(bechdel_model)
 ```
 
-Movie Budgets vs. Bechdel Test Binary
+### Movie Budgets vs. Bechdel Test Binary
 
 ```{r}
-#| label: fig-
-#| fig-cap: " "
+#| label: fig-Categorical_vizualization
+#| fig-cap: "Catagorical Visualization of difference between average movie budgets "
 #| eval: true
 #| echo: false
 #| message: false
@@ -174,32 +181,31 @@ The probability of observing a test statistic at least as extreme as the one obs
 
 Our alpha level is 0.05, and our p-value is 0, and because p-value \< alpha value, we can reject the null hypothesis and conclude that there is a statistical significance between the average budget and a movie passing or failing the bechdel test.
 
+### Fitted Regression Table
+
 ```{r}
-#| label: tbl-
-#| tbl-cap: " "
+#| label: tbl-fitted_regression_table
+#| tbl-cap: "Fitted Regression Table"
 #| eval: true
 #| echo: false
 #| message: false
 movies_model <- lm(budget_2013 ~ binary, data = movies_clean)
-
 get_regression_table(movies_model)
 ```
 
-Regression Equation:\
+### Regression Equation:\
 
 $$
 \widehat{Budget} = b_0 + b_1 \cdot 1_{Pass}(Binary)
-\tag{1}
 $$
 
 
-$$\
+$$
 \widehat{Budget} = 62911555 + (-16637388 * 1_{Pass}(Binary))
 $$
 
 
-Each Coefficient Explained: Budget_2013\
-Binary
+
 
 ## Results
 
